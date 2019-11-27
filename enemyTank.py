@@ -15,7 +15,8 @@ class EnemyTank(pygame.sprite.Sprite):
         # 参数:坦克种类      
         self.kind = kind
         if not kind:
-            self.kind = random.choice([1, 2, 3, 4])     
+            # self.kind = random.choice([1, 2, 3, 4]) 
+            self.kind = random.choice([1, 2, 3])     
             
         # 选择敌军坦克种类        
         if self.kind == 1:
@@ -27,9 +28,9 @@ class EnemyTank(pygame.sprite.Sprite):
         if self.kind == 3:
             self.enemy_x_0 = pygame.image.load("image/enemy_3_1.png").convert_alpha()
             self.enemy_x_3 = pygame.image.load("image/enemy_3_0.png").convert_alpha()
-        if self.kind == 4:
-            self.enemy_x_0 = pygame.image.load("image/enemy_4_0.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load("image/enemy_4_3.png").convert_alpha()
+        # if self.kind == 4:
+        #     self.enemy_x_0 = pygame.image.load("image/enemy_4_0.png").convert_alpha()
+        #     self.enemy_x_3 = pygame.image.load("image/enemy_4_3.png").convert_alpha()
         self.enemy_3_0 = pygame.image.load("image/enemy_3_0.png").convert_alpha()
         self.enemy_3_2 = pygame.image.load("image/enemy_3_2.png").convert_alpha()
         

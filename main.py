@@ -7,8 +7,67 @@ import traceback
 import wall
 import myTank
 import enemyTank
-import food
+# import food
     
+
+#开始界面显示
+def startInterface(screen, width, height):
+	tfont = pygame.font.Font('font/simkai.ttf', width//4)
+	cfont = pygame.font.Font('font/simkai.ttf', width//20)
+	title = tfont.render(u'坦克大战', True, (255, 0, 0))
+	content1 = cfont.render(u'按1键进入单人游戏', True, (0, 0, 255))
+	content2 = cfont.render(u'按2键进入双人人游戏', True, (0, 0, 255))
+	content3 = cfont.render(u'按3键关闭音效', True, (0, 0, 255))
+	trect = title.get_rect()
+	trect.midtop = (width/2, height/4)
+	crect1 = content1.get_rect()
+	crect1.midtop = (width/2, height/1.8)
+	crect2 = content2.get_rect()
+	crect2.midtop = (width/2, height/1.6)
+	crect3 = content3.get_rect()
+	crect3.midtop = (width/2, height/1.4)
+	screen.blit(title, trect)
+	screen.blit(content1, crect1)
+	screen.blit(content2, crect2)
+	screen.blit(content3, crect3)
+	pygame.display.update()
+	while True:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				sys.exit()
+			elif event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_1:
+					return 1
+				if event.key == pygame.K_2:
+					return 2
+				if event.key == pygame.K_3:
+					return 3
+
+def endInterface(screen, width, height, isWin, stage):
+    bgImg = pygame.image.load("background.png")
+    screen.blit(bgImg, (0,0))
+    if isWin:
+        font = pygame.font.Font('font/simkai.ttf', width//10)
+        content = font.render(u'恭喜通关！', True, (255, 0, 0))
+        rect = content.get_rect()
+        rect.midtop = (width/2, height/2)
+        screen.blit(content, rect)
+    else:
+        failImg = pygame.image.load("gameover.png")
+        font = pygame.font.Font('font/simkai.ttf', width//10)
+        content = font.render(u'通过了%d关' % stage, True, (255, 0, 0))
+        crect = content.get_rect()
+        crect.midtop = (width/2, height/1.8)
+        rect = failImg.get_rect()
+        rect.midtop = (width/2, height/2)
+        screen.blit(failImg, rect)
+        screen.blit(content, crect)
+    pygame.display.update()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
 
 def main():
     print(os.getcwd())
@@ -30,6 +89,8 @@ def main():
     fire_sound           = pygame.mixer.Sound("music/Gunfire.wav")
     start_sound          = pygame.mixer.Sound("music/start.wav")
     start_sound.play()
+
+    num_player = startInterface(screen, 630, 630)
     
     # 定义精灵组:坦克，我方坦克，敌方坦克，敌方子弹
     allTankGroup     = pygame.sprite.Group()
@@ -42,7 +103,7 @@ def main():
     # 创建地图 
     bgMap = wall.Map()
     # 创建食物/道具 但不显示
-    prop = food.Food()
+    # prop = food.Food()
     # 创建我方坦克
     myTank_T1 = myTank.MyTank(1)
     allTankGroup.add(myTank_T1)
@@ -50,7 +111,7 @@ def main():
     myTank_T2 = myTank.MyTank(2)
     allTankGroup.add(myTank_T2)
     mytankGroup.add(myTank_T2)
-    # 创建敌方 坦克
+    # 创建敌方 坦克 
     for i in range(1, 4):
             enemy = enemyTank.EnemyTank(i)
             allTankGroup.add(enemy)
@@ -83,8 +144,8 @@ def main():
     MYBULLETNOTCOOLINGEVENT = pygame.constants.USEREVENT + 2
     pygame.time.set_timer(MYBULLETNOTCOOLINGEVENT, 200)
     # 敌方坦克 静止8000
-    NOTMOVEEVENT = pygame.constants.USEREVENT + 3
-    pygame.time.set_timer(NOTMOVEEVENT, 8000)
+    # NOTMOVEEVENT = pygame.constants.USEREVENT + 3
+    # pygame.time.set_timer(NOTMOVEEVENT, 8000)
     
     
     delay = 100
@@ -115,8 +176,8 @@ def main():
                     each.bulletNotCooling = True
             
             # 敌方坦克静止事件
-            if event.type == NOTMOVEEVENT:
-                enemyCouldMove = True
+            # if event.type == NOTMOVEEVENT:
+            #     enemyCouldMove = True
             
             # 创建敌方坦克延迟
             if event.type == DELAYEVENT:
@@ -481,37 +542,37 @@ def main():
                             each.bullet.life = False
              
         # 最后画食物/道具
-        if prop.life:
-            screen.blit(prop.image, prop.rect)
-            # 我方坦克碰撞 食物/道具
-            if pygame.sprite.collide_rect(myTank_T1, prop):
-                if prop.kind == 1:  # 敌人全毁
-                    for each in allEnemyGroup:
-                        if pygame.sprite.spritecollide(each, allEnemyGroup, True, None):
-                            bang_sound.play()
-                            enemyNumber -= 1
-                    prop.life = False
-                if prop.kind == 2:  # 敌人静止
-                    enemyCouldMove = False
-                    prop.life = False
-                if prop.kind == 3:  # 子弹增强
-                    myTank_T1.bullet.strong = True
-                    prop.life = False
-                if prop.kind == 4:  # 家得到保护
-                    for x, y in [(11,23),(12,23),(13,23),(14,23),(11,24),(14,24),(11,25),(14,25)]:
-                        bgMap.iron = wall.Iron()
-                        bgMap.iron.rect.left, bgMap.iron.rect.top = 3 + x * 24, 3 + y * 24
-                        bgMap.ironGroup.add(bgMap.iron)                
-                    prop.life = False
-                if prop.kind == 5:  # 坦克无敌
-                    prop.life = False
-                    pass
-                if prop.kind == 6:  # 坦克升级
-                    myTank_T1.levelUp()
-                    prop.life = False
-                if prop.kind == 7:  # 坦克生命+1
-                    myTank_T1.life += 1
-                    prop.life = False
+        # if prop.life:
+        #     screen.blit(prop.image, prop.rect)
+        #     # 我方坦克碰撞 食物/道具
+        #     if pygame.sprite.collide_rect(myTank_T1, prop):
+        #         if prop.kind == 1:  # 敌人全毁
+        #             for each in allEnemyGroup:
+        #                 if pygame.sprite.spritecollide(each, allEnemyGroup, True, None):
+        #                     bang_sound.play()
+        #                     enemyNumber -= 1
+        #             prop.life = False
+        #         if prop.kind == 2:  # 敌人静止
+        #             enemyCouldMove = False
+        #             prop.life = False
+        #         if prop.kind == 3:  # 子弹增强
+        #             myTank_T1.bullet.strong = True
+        #             prop.life = False
+        #         if prop.kind == 4:  # 家得到保护
+        #             for x, y in [(11,23),(12,23),(13,23),(14,23),(11,24),(14,24),(11,25),(14,25)]:
+        #                 bgMap.iron = wall.Iron()
+        #                 bgMap.iron.rect.left, bgMap.iron.rect.top = 3 + x * 24, 3 + y * 24
+        #                 bgMap.ironGroup.add(bgMap.iron)                
+        #             prop.life = False
+        #         if prop.kind == 5:  # 坦克无敌
+        #             prop.life = False
+        #             pass
+        #         if prop.kind == 6:  # 坦克升级
+        #             myTank_T1.levelUp()
+        #             prop.life = False
+        #         if prop.kind == 7:  # 坦克生命+1
+        #             myTank_T1.life += 1
+        #             prop.life = False
                     
             
              
