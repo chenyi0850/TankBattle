@@ -5,7 +5,8 @@ import bulletClass
 
 
 class EnemyTank(pygame.sprite.Sprite):
-    def __init__(self, x = None, kind = None, isred = None):
+    # def __init__(self, x = None, kind = None, isred = None):
+    def __init__(self, x = None, kind = None):
         pygame.sprite.Sprite.__init__(self)
         
         # 坦克出现前动画是否播放
@@ -20,29 +21,33 @@ class EnemyTank(pygame.sprite.Sprite):
             
         # 选择敌军坦克种类        
         if self.kind == 1:
-            self.enemy_x_0 = pygame.image.load("image/enemy_1_0.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load("image/enemy_1_3.png").convert_alpha()
-        if self.kind == 2:
             self.enemy_x_0 = pygame.image.load("image/enemy_2_0.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load("image/enemy_2_3.png").convert_alpha()
+            # self.enemy_x_3 = pygame.image.load("image/enemy_1_3.png").convert_alpha()
+        if self.kind == 2:
+            self.enemy_x_0 = pygame.image.load("image/enemy_1_1.png").convert_alpha()
+            # self.enemy_x_3 = pygame.image.load("image/enemy_2_3.png").convert_alpha()
         if self.kind == 3:
-            self.enemy_x_0 = pygame.image.load("image/enemy_3_1.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load("image/enemy_3_0.png").convert_alpha()
+            self.enemy_x_0 = pygame.image.load("image/enemy_3_3.png").convert_alpha()
+            # self.enemy_x_3 = pygame.image.load("image/enemy_3_0.png").convert_alpha()
         # if self.kind == 4:
         #     self.enemy_x_0 = pygame.image.load("image/enemy_4_0.png").convert_alpha()
         #     self.enemy_x_3 = pygame.image.load("image/enemy_4_3.png").convert_alpha()
+        self.enemy_2_1 = pygame.image.load("image/enemy_1_0.png").convert_alpha()
+
+
         self.enemy_3_0 = pygame.image.load("image/enemy_3_0.png").convert_alpha()
         self.enemy_3_2 = pygame.image.load("image/enemy_3_2.png").convert_alpha()
         
         
         # 参数:是否携带食物
-        self.isred = isred
-        if not None:
-            self.isred = random.choice((True, False, False, False, False))
-        if self.isred:
-            self.tank = self.enemy_x_3
-        else:
-            self.tank = self.enemy_x_0
+        # self.isred = isred
+        # if not None:
+        #     self.isred = random.choice((True, False, False, False, False))
+        # if self.isred:
+        #     self.tank = self.enemy_x_3
+        # else:
+        #     self.tank = self.enemy_x_0
+        self.tank = self.enemy_x_0
         # 参数:坦克位置
         self.x = x
         if not self.x:
@@ -56,19 +61,24 @@ class EnemyTank(pygame.sprite.Sprite):
         self.rect.left, self.rect.top = 3 + self.x * 12 * 24, 3 + 0 * 24
         
         # 坦克速度   方向   生命   子弹生命   子弹延迟
-        self.speed = 1
+        # self.speed = 1
         self.dir_x, self.dir_y = 0, 1
-        self.life = 1
+        # self.life = 1
         self.bulletNotCooling = True
         self.bullet = bulletClass.Bullet()
         # 是否撞墙，撞墙则改变方向
         self.dirChange = False
         
         # 每种坦克不同的属性
-        if self.kind == 2:
+        if self.kind == 1:
+            self.life = 1
             self.speed = 3
-        if self.kind == 3:
+        if self.kind == 2:
+            self.life = 2
+            self.speed = 2
+        if self.kind == 3:#无需修改
             self.life = 3
+            self.speed = 1
         
     def shoot(self):
         # 赋予子弹生命

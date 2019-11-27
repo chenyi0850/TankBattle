@@ -1,4 +1,5 @@
 import pygame
+import random
 
 brickImage          = "image/brick.png"
 ironImage           = "image/iron.png"
@@ -63,5 +64,17 @@ class Map():
             self.iron = Iron()
             self.iron.rect.left, self.iron.rect.top = 3 + x * 24, 3 + y * 24
             self.ironGroup.add(self.iron)
-            
-        
+
+        # directionX = []
+        # directionY = []
+        # i = 10
+        # while i > 0:
+        #     directionX.append(random.randint(0 , 25))
+        #     directionY.append(random.randint(2 , 23))
+        #     i -= 1
+        #     # random.randint(a , b)    
+        # for x in directionX:
+        #     for y in directionY:
+        #         self.brick = Brick()
+        #         self.brick.rect.left, self.brick.rect.top = 3 + x * 24, 3 + y * 24
+        #         self.brickGroup.add(self.brick)
