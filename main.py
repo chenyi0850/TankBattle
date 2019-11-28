@@ -7,41 +7,52 @@ import traceback
 import wall
 import myTank
 import enemyTank
-# import food
     
 
+playerNum = 0
+closeMusic = False
+isDifficult = False
 #开始界面显示
 def startInterface(screen, width, height):
-	tfont = pygame.font.Font('font/simkai.ttf', width//4)
-	cfont = pygame.font.Font('font/simkai.ttf', width//20)
-	title = tfont.render(u'坦克大战', True, (255, 0, 0))
-	content1 = cfont.render(u'按1键进入单人游戏', True, (0, 0, 255))
-	content2 = cfont.render(u'按2键进入双人人游戏', True, (0, 0, 255))
-	content3 = cfont.render(u'按3键关闭音效', True, (0, 0, 255))
-	trect = title.get_rect()
-	trect.midtop = (width/2, height/4)
-	crect1 = content1.get_rect()
-	crect1.midtop = (width/2, height/1.8)
-	crect2 = content2.get_rect()
-	crect2.midtop = (width/2, height/1.6)
-	crect3 = content3.get_rect()
-	crect3.midtop = (width/2, height/1.4)
-	screen.blit(title, trect)
-	screen.blit(content1, crect1)
-	screen.blit(content2, crect2)
-	screen.blit(content3, crect3)
-	pygame.display.update()
-	while True:
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				sys.exit()
-			elif event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_1:
-					return 1
-				if event.key == pygame.K_2:
-					return 2
-				if event.key == pygame.K_3:
-					return 3
+    global playerNum
+    global closeMusic
+    global isDifficult
+    tfont = pygame.font.Font('font/simkai.ttf', width//4)
+    cfont = pygame.font.Font('font/simkai.ttf', width//25)
+    pfont = pygame.font.Font('font/simkai.ttf', width//45)
+    title = tfont.render(u'坦克大战', True, (255, 0, 0))
+    content1 = cfont.render(u'按1键选择单人游戏，按2键选择双人人游戏', True, (0, 0, 255))
+    content2 = cfont.render(u'按3键关闭音效，按4键选择困难模式，按5键进入游戏', True, (0, 0, 255))
+    content3 = pfont.render(u'游戏说明：我方每辆坦克有3条生命，过一关生命值加1，游戏默认简单模式,困难模式从第10关开始', True, (0, 0, 255))
+    trect = title.get_rect()
+    trect.midtop = (width/2, height/4)
+    crect1 = content1.get_rect()
+    crect1.midtop = (width/2, height/1.8)
+    crect2 = content2.get_rect()        
+    crect2.midtop = (width/2, height/1.6)
+    crect3 = content3.get_rect()
+    crect3.midtop = (width/2, height/1.2)
+    screen.blit(title, trect)
+    screen.blit(content1, crect1)
+    screen.blit(content2, crect2)
+    screen.blit(content3, crect3)
+    pygame.display.update()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    playerNum = 1
+                if event.key == pygame.K_2:
+                    playerNum = 2
+                    # return 2
+                if event.key == pygame.K_3:
+                    closeMusic = True
+                if event.key == pygame.K_4:
+                    isDifficult = True
+                if event.key == pygame.K_5:
+                    return
 
 def endInterface(screen, width, height, isWin, stage):
     bgImg = pygame.image.load("image/background.png")
@@ -53,7 +64,7 @@ def endInterface(screen, width, height, isWin, stage):
         rect.midtop = (width/2, height/2)
         screen.blit(content, rect)
     else:
-        failImg = pygame.image.load("gameover.png")
+        failImg = pygame.image.load("image/gameover.png")
         font = pygame.font.Font('font/simkai.ttf', width//10)
         content = font.render(u'通过了%d关' % stage, True, (255, 0, 0))
         crect = content.get_rect()
@@ -88,8 +99,6 @@ def switchStage(screen, width, height, stage):
 				return
 
 def main():
-    # print(os.getcwd())
-    # print(os.path.dirname(os.path.realpath('__file__')))
     pygame.init()
     pygame.mixer.init()
     
@@ -106,9 +115,8 @@ def main():
     bang_sound.set_volume(1)
     fire_sound           = pygame.mixer.Sound("music/Gunfire.wav")
     start_sound          = pygame.mixer.Sound("music/start.wav")
-    start_sound.play()
 
-    playerNum = startInterface(screen, 630, 630)
+    startInterface(screen, 630, 630)
     # 游戏关卡
     stage = 0
     totalStage = 2
@@ -121,9 +129,16 @@ def main():
         stage += 1
         if stage > totalStage:
             break
+        if closeMusic:
+            start_sound.set_volume(0)
+            bang_sound.set_volume(0)
+            fire_sound.set_volume(0)
+        if isDifficult:
+            stage = 10
         switchStage(screen, 630, 630, stage)
+        start_sound.play()
         #该关卡敌方坦克总数量
-        totalEnemyTanks = min(stage * 18, 80)
+        totalEnemyTanks = 19 + stage
         #场上存在的敌方坦克总数量
         existEnemyTanks = 0
         #场上可以存在的敌方坦克总数量
@@ -139,14 +154,10 @@ def main():
         enemyBulletGroup = pygame.sprite.Group()
         # 创建地图 
         bgMap = wall.Map()
-        # 创建食物/道具 但不显示
-        # prop = food.Food()
-        # 创建我方坦克
-        if playerNum == 1:
-            myTank_T1 = myTank.MyTank(1)
-            allTankGroup.add(myTank_T1)
-            mytankGroup.add(myTank_T1)
-        else:
+        myTank_T1 = myTank.MyTank(1)
+        allTankGroup.add(myTank_T1)
+        mytankGroup.add(myTank_T1)
+        if playerNum != 1:
             myTank_T2 = myTank.MyTank(2)
             allTankGroup.add(myTank_T2)
             mytankGroup.add(myTank_T2)
@@ -185,9 +196,6 @@ def main():
         # 创建 我方 子弹延迟200
         MYBULLETNOTCOOLINGEVENT = pygame.constants.USEREVENT + 2
         pygame.time.set_timer(MYBULLETNOTCOOLINGEVENT, 200)
-        # 敌方坦克 静止8000
-        # NOTMOVEEVENT = pygame.constants.USEREVENT + 3
-        # pygame.time.set_timer(NOTMOVEEVENT, 8000)
         
         
         delay = 100
@@ -223,10 +231,6 @@ def main():
                     for each in allEnemyGroup:
                         each.bulletNotCooling = True
                 
-                # 敌方坦克静止事件
-                # if event.type == NOTMOVEEVENT:
-                #     enemyCouldMove = True
-                
                 # 创建敌方坦克延迟
                 if event.type == DELAYEVENT:
                     if totalEnemyTanks > 0:
@@ -242,36 +246,7 @@ def main():
                             elif enemy.kind == 3:
                                 heavyEnemyGroup.add(enemy)
                             else:
-                                lightEnemyGroup.add(enemy)
-                                    
-                # if event.type == pygame.KEYDOWN:
-                #     if event.key == pygame.K_c and pygame.KMOD_CTRL:
-                #         pygame.quit()
-                #         sys.exit()
-                
-                #     if event.key == pygame.K_e:
-                #         myTank_T1.levelUp()
-                #     if event.key == pygame.K_q:
-                #         myTank_T1.levelDown()
-                #     if event.key == pygame.K_3:
-                #         myTank_T1.levelUp()
-                #         myTank_T1.levelUp()
-                #         myTank_T1.level = 3
-                #     if event.key == pygame.K_2:
-                #         if myTank_T1.speed == 3:
-                #             myTank_T1.speed = 24
-                #         else:
-                #             myTank_T1.speed = 3
-                #     if event.key == pygame.K_1:
-                #         for x, y in [(11,23),(12,23),(13,23),(14,23),(11,24),(14,24),(11,25),(14,25)]:
-                #             bgMap.brick = wall.Brick()
-                #             bgMap.brick.rect.left, bgMap.brick.rect.top = 3 + x * 24, 3 + y * 24
-                #             bgMap.brickGroup.add(bgMap.brick)                
-                #     if event.key == pygame.K_4:
-                #         for x, y in [(11,23),(12,23),(13,23),(14,23),(11,24),(14,24),(11,25),(14,25)]:
-                #             bgMap.iron = wall.Iron()
-                #             bgMap.iron.rect.left, bgMap.iron.rect.top = 3 + x * 24, 3 + y * 24
-                #             bgMap.ironGroup.add(bgMap.iron)                
+                                lightEnemyGroup.add(enemy)           
                     
 
 
@@ -338,7 +313,7 @@ def main():
                     if myTank_T1.moveRight(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
                         moving = 0
                     allTankGroup.add(myTank_T1)
-            if key_pressed[pygame.K_j]:
+            if key_pressed[pygame.K_SPACE]:
                 if not myTank_T1.bullet.life and myTank_T1.bulletNotCooling:
                     fire_sound.play()
                     myTank_T1.shoot()
@@ -590,13 +565,19 @@ def main():
                             myTank_T1.rect.left, myTank_T1.rect.top = 3 + 8 * 24, 3 + 24 * 24 
                             each.bullet.life = False
                             moving = 0  # 重置移动控制参数
-                            for i in range(myTank_T1.level+1):
-                                myTank_T1.levelDown()
+                            # for i in range(myTank_T1.level+1):
+                            #     myTank_T1.levelDown()
+                            myTank_T1.life -= 1
+                            if myTank_T1.life == 0:
+                                isOver = True
                         if playerNum != 1:
                             if pygame.sprite.collide_rect(each.bullet, myTank_T2):
                                 bang_sound.play()
                                 myTank_T2.rect.left, myTank_T2.rect.top = 3 + 16 * 24, 3 + 24 * 24 
                                 each.bullet.life = False
+                                myTank_T2.life -= 1
+                                if myTank_T2.life == 0 and myTank_T1.life == 0:
+                                    isOver = True
                         # 子弹 碰撞 brickGroup
                         if pygame.sprite.spritecollide(each.bullet, bgMap.brickGroup, True, None):
                             each.bullet.life = False
