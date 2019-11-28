@@ -4,19 +4,49 @@ import random
 brickImage          = "image/brick.png"
 ironImage           = "image/iron.png"
 
+#砖块
 class Brick(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         
         self.image = pygame.image.load(brickImage)
         self.rect = self.image.get_rect()
-        
+#铁块       
 class Iron(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         
         self.image = pygame.image.load(ironImage)
         self.rect = self.image.get_rect()
+
+#冰
+class Ice(pygame.sprite.Sprite):
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self)
+		self.ice = pygame.image.load('images/scene/ice.png')
+		self.rect = self.ice.get_rect()
+		self.being = False
+
+
+# 河流
+class River(pygame.sprite.Sprite):
+	def __init__(self, kind=None):
+		pygame.sprite.Sprite.__init__(self)
+		if kind is None:
+			self.kind = random.randint(0, 1)
+		self.rivers = ['images/scene/river1.png', 'images/scene/river2.png']
+		self.river = pygame.image.load(self.rivers[self.kind])
+		self.rect = self.river.get_rect()
+		self.being = False
+
+
+# 树
+class Grass(pygame.sprite.Sprite):
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self)
+		self.grass = pygame.image.load('images/scene/tree.png')
+		self.rect = self.grass.get_rect()
+		self.being = False
         
 class Map():
     def __init__(self):

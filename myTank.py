@@ -16,7 +16,8 @@ class MyTank(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
         # 玩家生命
-        self.life = True
+        # self.life = True
+        self.life = 3
         
         #　第几个玩家   坦克的三个等级
         if playerNumber == 1:

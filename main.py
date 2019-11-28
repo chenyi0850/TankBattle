@@ -152,6 +152,9 @@ def main():
             mytankGroup.add(myTank_T2)
         # 创建敌方 坦克 
         for i in range(1, 4):
+            if totalEnemyTanks > 0:
+                totalEnemyTanks -= 1
+                existEnemyTanks += 1
                 enemy = enemyTank.EnemyTank(i)
                 allTankGroup.add(enemy)
                 allEnemyGroup.add(enemy)
@@ -192,14 +195,20 @@ def main():
         movdir = 0
         moving2 = 0
         movdir2 = 0
-        enemyNumber = 3
+        # existEnemyTanks = 3
         enemyCouldMove      = True
         switch_R1_R2_image  = True
         homeSurvive         = True
         running_T1          = True
         running_T2          = True
         clock = pygame.time.Clock()
+        # 关卡主循环
         while True:
+            if isOver:
+                break
+            if totalEnemyTanks < 1 and existEnemyTanks < 1:
+                isOver = False
+                break   
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -220,19 +229,20 @@ def main():
                 
                 # 创建敌方坦克延迟
                 if event.type == DELAYEVENT:
-                    if enemyNumber < 4:
-                        enemy = enemyTank.EnemyTank()
-                        if pygame.sprite.spritecollide(enemy, allTankGroup, False, None):
-                            break
-                        allEnemyGroup.add(enemy)
-                        allTankGroup.add(enemy)
-                        enemyNumber += 1
-                        if enemy.kind == 2:
-                            mediumEnemyGroup.add(enemy)
-                        elif enemy.kind == 3:
-                            heavyEnemyGroup.add(enemy)
-                        else:
-                            lightEnemyGroup.add(enemy)
+                    if totalEnemyTanks > 0:
+                        if existEnemyTanks < canExistEnemyTanks: 
+                            enemy = enemyTank.EnemyTank()
+                            if pygame.sprite.spritecollide(enemy, allTankGroup, False, None):
+                                break
+                            allEnemyGroup.add(enemy)
+                            allTankGroup.add(enemy)
+                            existEnemyTanks += 1
+                            if enemy.kind == 2:
+                                mediumEnemyGroup.add(enemy)
+                            elif enemy.kind == 3:
+                                heavyEnemyGroup.add(enemy)
+                            else:
+                                lightEnemyGroup.add(enemy)
                                     
                 # if event.type == pygame.KEYDOWN:
                 #     if event.key == pygame.K_c and pygame.KMOD_CTRL:
@@ -481,7 +491,7 @@ def main():
                 # if pygame.sprite.spritecollide(myTank_T1.bullet, mediumEnemyGroup, True, None):
                 #     # prop.change()
                 #     bang_sound.play()
-                #     enemyNumber -= 1
+                #     existEnemyTanks -= 1
                 #     myTank_T1.bullet.life = False
                 if pygame.sprite.spritecollide(myTank_T1.bullet,mediumEnemyGroup, False, None):
                     for each in mediumEnemyGroup:
@@ -489,7 +499,8 @@ def main():
                             if each.life == 1:
                                 pygame.sprite.spritecollide(myTank_T1.bullet,mediumEnemyGroup, True, None)
                                 bang_sound.play()
-                                enemyNumber -= 1
+                                existEnemyTanks -= 1
+                                totalEnemyTanks -= 1
                             elif each.life == 2:
                                 each.life -= 1
                                 each.tank = each.enemy_2_1
@@ -500,7 +511,8 @@ def main():
                             if each.life == 1:
                                 pygame.sprite.spritecollide(myTank_T1.bullet,heavyEnemyGroup, True, None)
                                 bang_sound.play()
-                                enemyNumber -= 1
+                                existEnemyTanks -= 1
+                                totalEnemyTanks -= 1
                             elif each.life == 2:
                                 each.life -= 1
                                 each.tank = each.enemy_3_0
@@ -510,11 +522,12 @@ def main():
                     myTank_T1.bullet.life = False
                 elif pygame.sprite.spritecollide(myTank_T1.bullet, lightEnemyGroup, True, None):
                     bang_sound.play()
-                    enemyNumber -= 1
+                    existEnemyTanks -= 1
+                    totalEnemyTanks -= 1
                     myTank_T1.bullet.life = False    
                 #if pygame.sprite.spritecollide(myTank_T1.bullet, allEnemyGroup, True, None):
                 #    bang_sound.play()
-                #    enemyNumber -= 1
+                #    existEnemyTanks -= 1
                 #    myTank_T1.bullet.life = False
                 # 子弹 碰撞 brickGroup
                 if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.brickGroup, True, None):
@@ -538,7 +551,8 @@ def main():
                     # 子弹 碰撞 敌方坦克
                     if pygame.sprite.spritecollide(myTank_T2.bullet, allEnemyGroup, True, None):
                         bang_sound.play()
-                        enemyNumber -= 1
+                        existEnemyTanks -= 1
+                        totalEnemyTanks -= 1
                         myTank_T2.bullet.life = False
                     # 子弹 碰撞 brickGroup
                     if pygame.sprite.spritecollide(myTank_T2.bullet, bgMap.brickGroup, True, None):
@@ -594,38 +608,7 @@ def main():
                             if pygame.sprite.spritecollide(each.bullet, bgMap.ironGroup, False, None):
                                 each.bullet.life = False
                 
-            # 最后画食物/道具
-            # if prop.life:
-            #     screen.blit(prop.image, prop.rect)
-            #     # 我方坦克碰撞 食物/道具
-            #     if pygame.sprite.collide_rect(myTank_T1, prop):
-            #         if prop.kind == 1:  # 敌人全毁
-            #             for each in allEnemyGroup:
-            #                 if pygame.sprite.spritecollide(each, allEnemyGroup, True, None):
-            #                     bang_sound.play()
-            #                     enemyNumber -= 1
-            #             prop.life = False
-            #         if prop.kind == 2:  # 敌人静止
-            #             enemyCouldMove = False
-            #             prop.life = False
-            #         if prop.kind == 3:  # 子弹增强
-            #             myTank_T1.bullet.strong = True
-            #             prop.life = False
-            #         if prop.kind == 4:  # 家得到保护
-            #             for x, y in [(11,23),(12,23),(13,23),(14,23),(11,24),(14,24),(11,25),(14,25)]:
-            #                 bgMap.iron = wall.Iron()
-            #                 bgMap.iron.rect.left, bgMap.iron.rect.top = 3 + x * 24, 3 + y * 24
-            #                 bgMap.ironGroup.add(bgMap.iron)                
-            #             prop.life = False
-            #         if prop.kind == 5:  # 坦克无敌
-            #             prop.life = False
-            #             pass
-            #         if prop.kind == 6:  # 坦克升级
-            #             myTank_T1.levelUp()
-            #             prop.life = False
-            #         if prop.kind == 7:  # 坦克生命+1
-            #             myTank_T1.life += 1
-            #             prop.life = False
+            
                         
                 
                 
