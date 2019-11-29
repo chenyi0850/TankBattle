@@ -3,11 +3,11 @@ import bulletClass
 
 
 tank_T1_0 = "image/tank_T1_0.png"
-tank_T1_1 = "image/tank_T1_1.png"
-tank_T1_2 = "image/tank_T1_2.png"
+# tank_T1_1 = "image/tank_T1_1.png"
+# tank_T1_2 = "image/tank_T1_2.png"
 tank_T2_0 = "image/tank_T2_0.png"
-tank_T2_1 = "image/tank_T2_1.png"
-tank_T2_2 = "image/tank_T2_2.png"
+# tank_T2_1 = "image/tank_T2_1.png"
+# tank_T2_2 = "image/tank_T2_2.png"
 
        
 
@@ -22,13 +22,13 @@ class MyTank(pygame.sprite.Sprite):
         #　第几个玩家   坦克的三个等级
         if playerNumber == 1:
             self.tank_L0_image = pygame.image.load(tank_T1_0).convert_alpha()
-            self.tank_L1_image = pygame.image.load(tank_T1_1).convert_alpha()
-            self.tank_L2_image = pygame.image.load(tank_T1_2).convert_alpha()
+            # self.tank_L1_image = pygame.image.load(tank_T1_1).convert_alpha()
+            # self.tank_L2_image = pygame.image.load(tank_T1_2).convert_alpha()
         if playerNumber == 2:
             self.tank_L0_image = pygame.image.load(tank_T2_0).convert_alpha()
-            self.tank_L1_image = pygame.image.load(tank_T2_1).convert_alpha()
-            self.tank_L2_image = pygame.image.load(tank_T2_2).convert_alpha()
-        self.level = 0
+            # self.tank_L1_image = pygame.image.load(tank_T2_1).convert_alpha()
+            # self.tank_L2_image = pygame.image.load(tank_T2_2).convert_alpha()
+        # self.level = 0
         
         # 初始坦克为0级
         self.tank = self.tank_L0_image
@@ -68,40 +68,40 @@ class MyTank(pygame.sprite.Sprite):
             self.bullet.rect.left = self.rect.right + 1
             self.bullet.rect.top = self.rect.top + 20
         
-        if self.level == 1:
-            self.bullet.speed  = 16
-            self.bullet.strong = False
-        if self.level == 2:
-            self.bullet.speed  = 16
-            self.bullet.strong = True
-        if self.level == 3:
-            self.bullet.speed  = 48
-            self.bullet.strong = True
+        # if self.level == 1:
+        #     self.bullet.speed  = 16
+        #     self.bullet.strong = False
+        # if self.level == 2:
+        #     self.bullet.speed  = 16
+        #     self.bullet.strong = True
+        # if self.level == 3:
+        #     self.bullet.speed  = 48
+        #     self.bullet.strong = True
         
     
-    def levelUp(self):
-        if self.level < 2:
-            self.level += 1
-        if self.level == 0:
-            self.tank = self.tank_L0_image
-        if self.level == 1:
-            self.tank = self.tank_L1_image
-        if self.level == 2:
-            self.tank = self.tank_L2_image
-        if self.level == 3:
-            self.tank = self.tank_L2_image
+    # def levelUp(self):
+    #     if self.level < 2:
+    #         self.level += 1
+    #     if self.level == 0:
+    #         self.tank = self.tank_L0_image
+    #     if self.level == 1:
+    #         self.tank = self.tank_L1_image
+    #     if self.level == 2:
+    #         self.tank = self.tank_L2_image
+    #     if self.level == 3:
+    #         self.tank = self.tank_L2_image
             
-    def levelDown(self):
-        if self.level > 0:
-            self.level -= 1
-        if self.level == 0:
-            self.tank = self.tank_L0_image
-            self.bullet.speed  = 6
-            self.bullet.strong = False
-        if self.level == 1:
-            self.tank = self.tank_L1_image
-        if self.level == 2:
-            self.tank = self.tank_L2_image
+    # def levelDown(self):
+    #     if self.level > 0:
+    #         self.level -= 1
+    #     if self.level == 0:
+    #         self.tank = self.tank_L0_image
+    #         self.bullet.speed  = 6
+    #         self.bullet.strong = False
+    #     if self.level == 1:
+    #         self.tank = self.tank_L1_image
+    #     if self.level == 2:
+    #         self.tank = self.tank_L2_image
         
         
     # 返回True 代表发生碰撞

@@ -54,25 +54,36 @@ def startInterface(screen, width, height):
                 if event.key == pygame.K_5:
                     return
 
-def endInterface(screen, width, height, isWin, stage):
+def endInterface(screen, width, height, isWin, stage, time):
     bgImg = pygame.image.load("image/background.png")
     screen.blit(bgImg, (0,0))
     if isWin:
         font = pygame.font.Font('font/simkai.ttf', width//10)
         content = font.render(u'恭喜通关！', True, (255, 0, 0))
+        time = time / 1000
+        content1 = font.render(u'用时%d秒' % time, True, (255, 0, 0))
         rect = content.get_rect()
         rect.midtop = (width/2, height/2)
+        crect1 = content1.get_rect()
+        crect1.midtop = (width/2, height/1.8)
         screen.blit(content, rect)
+        screen.blit(content1, crect1)
     else:
         failImg = pygame.image.load("image/gameover.png")
-        font = pygame.font.Font('font/simkai.ttf', width//10)
+        font = pygame.font.Font('font/simkai.ttf', width//20)
+        stage -= 1
         content = font.render(u'通过了%d关' % stage, True, (255, 0, 0))
+        time = time / 1000
+        content1 = font.render(u'用时%d秒' % time, True, (255, 0, 0))
         crect = content.get_rect()
-        crect.midtop = (width/2, height/1.8)
+        crect.midtop = (width/2, height/2)
+        crect1 = content1.get_rect()
+        crect1.midtop = (width/2, height/1.8)
         rect = failImg.get_rect()
-        rect.midtop = (width/2, height/2)
+        rect.midtop = (width/2, height/2.2)
         screen.blit(failImg, rect)
         screen.blit(content, crect)
+        screen.blit(content1, crect1)
     pygame.display.update()
     while True:
         for event in pygame.event.get():
@@ -117,6 +128,7 @@ def main():
     start_sound          = pygame.mixer.Sound("music/start.wav")
 
     startInterface(screen, 630, 630)
+    time1 = pygame.time.get_ticks()
     # 游戏关卡
     stage = 0
     totalStage = 2
@@ -509,10 +521,10 @@ def main():
                     myTank_T1.bullet.life = False
                     myTank_T1.bullet.rect.left, myTank_T1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
                 # 子弹 碰撞 brickGroup
-                if myTank_T1.bullet.strong:
-                    if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.ironGroup, True, None):
-                        myTank_T1.bullet.life = False
-                        myTank_T1.bullet.rect.left, myTank_T1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+                # if myTank_T1.bullet.strong:
+                #     if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.ironGroup, True, None):
+                #         myTank_T1.bullet.life = False
+                #         myTank_T1.bullet.rect.left, myTank_T1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
                 else:    
                     if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.ironGroup, False, None):
                         myTank_T1.bullet.life = False
@@ -534,10 +546,10 @@ def main():
                         myTank_T2.bullet.life = False
                         myTank_T2.bullet.rect.left, myTank_T2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
                     # 子弹 碰撞 brickGroup
-                    if myTank_T2.bullet.strong:
-                        if pygame.sprite.spritecollide(myTank_T2.bullet, bgMap.ironGroup, True, None):
-                            myTank_T2.bullet.life = False
-                            myTank_T2.bullet.rect.left, myTank_T2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+                    # if myTank_T2.bullet.strong:
+                    #     if pygame.sprite.spritecollide(myTank_T2.bullet, bgMap.ironGroup, True, None):
+                    #         myTank_T2.bullet.life = False
+                    #         myTank_T2.bullet.rect.left, myTank_T2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
                     else:    
                         if pygame.sprite.spritecollide(myTank_T2.bullet, bgMap.ironGroup, False, None):
                             myTank_T2.bullet.life = False
@@ -582,9 +594,9 @@ def main():
                         if pygame.sprite.spritecollide(each.bullet, bgMap.brickGroup, True, None):
                             each.bullet.life = False
                         # 子弹 碰撞 ironGroup
-                        if each.bullet.strong:
-                            if pygame.sprite.spritecollide(each.bullet, bgMap.ironGroup, True, None):
-                                each.bullet.life = False
+                        # if each.bullet.strong:
+                        #     if pygame.sprite.spritecollide(each.bullet, bgMap.ironGroup, True, None):
+                        #         each.bullet.life = False
                         else:    
                             if pygame.sprite.spritecollide(each.bullet, bgMap.ironGroup, False, None):
                                 each.bullet.life = False
@@ -601,10 +613,12 @@ def main():
             
             pygame.display.flip()
             clock.tick(60)
+    time2 = pygame.time.get_ticks()
+    time = time2 - time1
     if not isOver:
-        endInterface(screen, 630, 630, True, stage)
+        endInterface(screen, 630, 630, True, stage, time)
     else:
-        endInterface(screen, 630, 630, False, stage)
+        endInterface(screen, 630, 630, False, stage, time)
     
     
 if __name__ == "__main__":
