@@ -7,6 +7,7 @@ import traceback
 import wall
 import myTank
 import enemyTank
+import home
     
 
 playerNum = 0
@@ -46,7 +47,6 @@ def startInterface(screen, width, height):
                     playerNum = 1
                 if event.key == pygame.K_2:
                     playerNum = 2
-                    # return 2
                 if event.key == pygame.K_3:
                     closeMusic = True
                 if event.key == pygame.K_4:
@@ -119,8 +119,8 @@ def main():
     
     # 加载图片,音乐,音效.
     background_image     = pygame.image.load("image/background.png")
-    home_image           = pygame.image.load("image/home.png")
-    home_destroyed_image = pygame.image.load("image/home_destroyed.png")
+    # home_image           = pygame.image.load("image/home.png")
+    # home_destroyed_image = pygame.image.load("image/home_destroyed.png")
     
     bang_sound          = pygame.mixer.Sound("music/bang.wav")
     bang_sound.set_volume(1)
@@ -165,7 +165,7 @@ def main():
         lightEnemyGroup  = pygame.sprite.Group()  
         enemyBulletGroup = pygame.sprite.Group()
         # 创建地图 
-        bgMap = wall.Map()
+        bgMap = wall.Map(stage)
         myTank_T1 = myTank.MyTank(1)
         allTankGroup.add(myTank_T1)
         mytankGroup.add(myTank_T1)
@@ -209,7 +209,6 @@ def main():
         MYBULLETNOTCOOLINGEVENT = pygame.constants.USEREVENT + 2
         pygame.time.set_timer(MYBULLETNOTCOOLINGEVENT, 200)
         
-        
         delay = 100
         moving = 0
         movdir = 0
@@ -218,10 +217,13 @@ def main():
         # existEnemyTanks = 3
         enemyCouldMove      = True
         switch_R1_R2_image  = True
-        homeSurvive         = True
+        # homeSurvive         = True
         running_T1          = True
         running_T2          = True
         clock = pygame.time.Clock()
+
+        myhome = home.Home()
+        # myhome
         # 关卡主循环
         while True:
             if isOver:
@@ -401,10 +403,10 @@ def main():
             for each in bgMap.ironGroup:
                 screen.blit(each.image, each.rect)        
             # 画home
-            if homeSurvive:
-                screen.blit(home_image, (3 + 12 * 24, 3 + 24 * 24))
-            else:
-                screen.blit(home_destroyed_image, (3 + 12 * 24, 3 + 24 * 24))
+            # if homeSurvive:
+            #     screen.blit(home_image, (3 + 12 * 24, 3 + 24 * 24))
+            # else:
+            #     screen.blit(home_destroyed_image, (3 + 12 * 24, 3 + 24 * 24))
             # 画我方坦克1
             if not (delay % 5):
                 switch_R1_R2_image = not switch_R1_R2_image
