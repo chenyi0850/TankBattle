@@ -8,7 +8,10 @@ import wall
 import myTank
 import enemyTank
 import home
-    
+import music
+
+
+
 
 playerNum = 0
 closeMusic = False
@@ -122,10 +125,10 @@ def main():
     # home_image           = pygame.image.load("image/home.png")
     # home_destroyed_image = pygame.image.load("image/home_destroyed.png")
     
-    bang_sound          = pygame.mixer.Sound("music/bang.wav")
-    bang_sound.set_volume(1)
-    fire_sound           = pygame.mixer.Sound("music/Gunfire.wav")
-    start_sound          = pygame.mixer.Sound("music/start.wav")
+    # bang_sound          = pygame.mixer.Sound("music/bang.wav")
+    # bang_sound.set_volume(1)
+    # fire_sound           = pygame.mixer.Sound("music/Gunfire.wav")
+    # start_sound          = pygame.mixer.Sound("music/start.wav")
 
     startInterface(screen, 630, 630)
     time1 = pygame.time.get_ticks()
@@ -142,13 +145,15 @@ def main():
         if stage > totalStage:
             break
         if closeMusic:
-            start_sound.set_volume(0)
-            bang_sound.set_volume(0)
-            fire_sound.set_volume(0)
+            pass
+            # start_sound.set_volume(0)
+            # bang_sound.set_volume(0)
+            # fire_sound.set_volume(0)
         if isDifficult:
             stage = 10
         switchStage(screen, 630, 630, stage)
-        start_sound.play()
+        gameMusic = music.Music()
+        gameMusic.start()
         #该关卡敌方坦克总数量
         totalEnemyTanks = 19 + stage
         #场上存在的敌方坦克总数量
@@ -165,14 +170,15 @@ def main():
         lightEnemyGroup  = pygame.sprite.Group()  
         enemyBulletGroup = pygame.sprite.Group()
         # 创建地图 
-        bgMap = wall.Map(stage)
-        myTank_T1 = myTank.MyTank(1)
-        allTankGroup.add(myTank_T1)
-        mytankGroup.add(myTank_T1)
+        gameMap = wall.Map()
+        #创建我方坦克
+        myTank1 = myTank.MyTank(1)
+        allTankGroup.add(myTank1)
+        mytankGroup.add(myTank1)
         if playerNum != 1:
-            myTank_T2 = myTank.MyTank(2)
-            allTankGroup.add(myTank_T2)
-            mytankGroup.add(myTank_T2)
+            myTank2 = myTank.MyTank(2)
+            allTankGroup.add(myTank2)
+            mytankGroup.add(myTank2)
         # 创建敌方 坦克 
         for i in range(1, 4):
             if totalEnemyTanks > 0:
@@ -189,11 +195,11 @@ def main():
                     continue
                 lightEnemyGroup.add(enemy)
         # 敌军坦克出现动画
-        appearance_image = pygame.image.load("image/appear.png").convert_alpha()
-        appearance = []
-        appearance.append(appearance_image.subsurface(( 0, 0), (48, 48)))
-        appearance.append(appearance_image.subsurface((48, 0), (48, 48)))
-        appearance.append(appearance_image.subsurface((96, 0), (48, 48)))
+        # appearance_image = pygame.image.load("image/appear.png").convert_alpha()
+        # appearance = []
+        # appearance.append(appearance_image.subsurface(( 0, 0), (48, 48)))
+        # appearance.append(appearance_image.subsurface((48, 0), (48, 48)))
+        # appearance.append(appearance_image.subsurface((96, 0), (48, 48)))
         
         
         
@@ -210,14 +216,10 @@ def main():
         pygame.time.set_timer(MYBULLETNOTCOOLINGEVENT, 200)
         
         delay = 100
-        moving = 0
-        movdir = 0
-        moving2 = 0
-        movdir2 = 0
         # existEnemyTanks = 3
         enemyCouldMove      = True
-        switch_R1_R2_image  = True
-        # homeSurvive         = True
+        # switch_R1_R2_image  = True
+        homeSurvive         = True
         running_T1          = True
         running_T2          = True
         clock = pygame.time.Clock()
@@ -238,7 +240,9 @@ def main():
                 
                 # 我方子弹冷却事件
                 if event.type == MYBULLETNOTCOOLINGEVENT:
-                    myTank_T1.bulletNotCooling = True
+                    myTank1.bulletNotCooling = True
+                    if playerNum != 1:
+                        myTank2.bulletNotCooling = True
                     
                 # 敌方子弹冷却事件
                 if event.type == ENEMYBULLETNOTCOOLINGEVENT:
@@ -267,129 +271,26 @@ def main():
             # 检查用户的键盘操作
             key_pressed = pygame.key.get_pressed()
             # 玩家一的移动操作
-            if moving:
-                moving -= 1
-                if movdir == 0:
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveUp(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving += 1
-                    allTankGroup.add(myTank_T1)
-                    running_T1 = True
-                if movdir == 1:
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveDown(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving += 1
-                    allTankGroup.add(myTank_T1)
-                    running_T1 = True
-                if movdir == 2:
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveLeft(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving += 1
-                    allTankGroup.add(myTank_T1)
-                    running_T1 = True
-                if movdir == 3:
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveRight(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving += 1
-                    allTankGroup.add(myTank_T1)
-                    running_T1 = True
-                    
-            if not moving:
-                if key_pressed[pygame.K_w]:
-                    moving = 7
-                    movdir = 0
-                    running_T1 = True
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveUp(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving = 0
-                    allTankGroup.add(myTank_T1)
-                elif key_pressed[pygame.K_s]:
-                    moving = 7
-                    movdir = 1
-                    running_T1 = True
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveDown(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving = 0
-                    allTankGroup.add(myTank_T1)
-                elif key_pressed[pygame.K_a]:
-                    moving = 7
-                    movdir = 2
-                    running_T1 = True
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveLeft(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving = 0
-                    allTankGroup.add(myTank_T1)
-                elif key_pressed[pygame.K_d]:
-                    moving = 7
-                    movdir = 3
-                    running_T1 = True
-                    allTankGroup.remove(myTank_T1)
-                    if myTank_T1.moveRight(allTankGroup, bgMap.brickGroup, bgMap.ironGroup):
-                        moving = 0
-                    allTankGroup.add(myTank_T1)
+            myTank1.move1(allTankGroup, gameMap.brickGroup, gameMap.ironGroup)
+            # fire = pygame.mixer.Sound("music/Gunfire.wav")
             if key_pressed[pygame.K_SPACE]:
-                if not myTank_T1.bullet.life and myTank_T1.bulletNotCooling:
-                    fire_sound.play()
-                    myTank_T1.shoot()
-                    myTank_T1.bulletNotCooling = False
+                if not myTank1.bullet.life and myTank1.bulletNotCooling:
+                    # fire.play()
+                    gameMusic.fire()
+                    myTank1.shoot()
+                    myTank1.bulletNotCooling = False
                     
             # 玩家二的移动操作
-            if moving2:
-                moving2 -= 1
-                if movdir2 == 0:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveUp(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    running_T2 = True
-                if movdir2 == 1:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveDown(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    running_T2 = True
-                if movdir2 == 2:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveLeft(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    running_T2 = True
-                if movdir2 == 3:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveRight(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    running_T2 = True
-                    
-            if not moving2:
-                if key_pressed[pygame.K_UP]:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveUp(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    moving2 = 7
-                    movdir2 = 0
-                    running_T2 = True
-                elif key_pressed[pygame.K_DOWN]:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveDown(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    moving2 = 7
-                    movdir2 = 1
-                    running_T2 = True
-                elif key_pressed[pygame.K_LEFT]:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveLeft(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    moving2 = 7
-                    movdir2 = 2
-                    running_T2 = True
-                elif key_pressed[pygame.K_RIGHT]:
-                    allTankGroup.remove(myTank_T2)
-                    myTank_T2.moveRight(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                    allTankGroup.add(myTank_T2)
-                    moving2 = 7
-                    movdir2 = 3
-                    running_T2 = True
-            if key_pressed[pygame.K_KP0]:
-                if not myTank_T2.bullet.life:
-                    # fire_sound.play()
-                    myTank_T2.shoot()
+            if playerNum != 1:
+                myTank2.move2(allTankGroup, gameMap.brickGroup, gameMap.ironGroup)
+                if key_pressed[pygame.K_KP0]:
+                    if not myTank2.bullet.life and myTank2.bulletNotCooling:
+                        gameMusic.fire()
+                        myTank2.shoot()
+                        myTank2.bulletNotCooling = False 
+            
+            
+                
             
             
             
@@ -397,211 +298,239 @@ def main():
             # 画背景
             screen.blit(background_image, (0, 0))
             # 画砖块
-            for each in bgMap.brickGroup:
+            for each in gameMap.brickGroup:
                 screen.blit(each.image, each.rect)        
-            # 花石头
-            for each in bgMap.ironGroup:
-                screen.blit(each.image, each.rect)        
-            # 画home
-            # if homeSurvive:
-            #     screen.blit(home_image, (3 + 12 * 24, 3 + 24 * 24))
-            # else:
-            #     screen.blit(home_destroyed_image, (3 + 12 * 24, 3 + 24 * 24))
+            # 画石头
+            for each in gameMap.ironGroup:
+                screen.blit(each.image, each.rect)     
+            #画草地
+            for each in gameMap.grassGroup:
+                screen.blit(each.image, each.rect)   
+            # 画大本营
+            screen.blit(myhome.home, myhome.rect)
             # 画我方坦克1
-            if not (delay % 5):
-                switch_R1_R2_image = not switch_R1_R2_image
-            if switch_R1_R2_image and running_T1:
-                screen.blit(myTank_T1.tank_R0, (myTank_T1.rect.left, myTank_T1.rect.top))
-                running_T1 = False
-            else:
-                screen.blit(myTank_T1.tank_R1, (myTank_T1.rect.left, myTank_T1.rect.top))
+            # if not (delay % 5):
+            #     switch_R1_R2_image = not switch_R1_R2_image
+            if myTank1.life != 0:
+                if running_T1:
+                    screen.blit(myTank1.tank_R0, (myTank1.rect.left, myTank1.rect.top))
+                    running_T1 = False
+                # if switch_R1_R2_image and running_T1:
+                #     screen.blit(myTank1.tank_R0, (myTank1.rect.left, myTank1.rect.top))
+                #     running_T1 = False
+                else:
+                    screen.blit(myTank1.tank_R1, (myTank1.rect.left, myTank1.rect.top))
             # 画我方坦克2
             if playerNum != 1: 
-                if switch_R1_R2_image and running_T2:
-                    screen.blit(myTank_T2.tank_R0, (myTank_T2.rect.left, myTank_T2.rect.top))
+                if running_T2:
+                    screen.blit(myTank2.tank_R0, (myTank2.rect.left, myTank2.rect.top))
                     running_T2 = False
+                # if switch_R1_R2_image and running_T2:
+                #     screen.blit(myTank2.tank_R0, (myTank2.rect.left, myTank2.rect.top))
+                #     running_T2 = False
                 else:
-                    screen.blit(myTank_T2.tank_R1, (myTank_T2.rect.left, myTank_T2.rect.top))    
+                    screen.blit(myTank2.tank_R1, (myTank2.rect.left, myTank2.rect.top))    
             # 画敌方坦克
-            for each in allEnemyGroup:
-                # 判断5毛钱特效是否播放            
-                if each.flash:
-                    #　判断画左动作还是右动作
-                    if switch_R1_R2_image:
-                        screen.blit(each.tank_R0, (each.rect.left, each.rect.top))
-                        if enemyCouldMove:
-                            allTankGroup.remove(each)
-                            each.move(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                            allTankGroup.add(each)
-                    else:
-                        screen.blit(each.tank_R1, (each.rect.left, each.rect.top))
-                        if enemyCouldMove:
-                            allTankGroup.remove(each)
-                            each.move(allTankGroup, bgMap.brickGroup, bgMap.ironGroup)
-                            allTankGroup.add(each)                    
-                else:
-                    # 播放5毛钱特效
-                    if each.times > 0:
-                        each.times -= 1
-                        if each.times <= 10:
-                            screen.blit(appearance[2], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 20:
-                            screen.blit(appearance[1], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 30:
-                            screen.blit(appearance[0], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 40:
-                            screen.blit(appearance[2], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 50:
-                            screen.blit(appearance[1], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 60:
-                            screen.blit(appearance[0], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 70:
-                            screen.blit(appearance[2], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 80:
-                            screen.blit(appearance[1], (3 + each.x * 12 * 24, 3))
-                        elif each.times <= 90:
-                            screen.blit(appearance[0], (3 + each.x * 12 * 24, 3))
-                    if each.times == 0:
-                        each.flash = True
+            enemy.cartoon()
+            enemy.creatImage(allEnemyGroup, allTankGroup, screen, gameMap.brickGroup, gameMap.ironGroup)
+            # for each in allEnemyGroup:
+            #     # 判断5毛钱特效是否播放            
+            #     if each.flash:
+            #         #　判断画左动作还是右动作
+            #         if switch_R1_R2_image:
+            #             screen.blit(each.tank_R0, (each.rect.left, each.rect.top))
+            #             if enemyCouldMove:
+            #                 allTankGroup.remove(each)
+            #                 each.move(allTankGroup, gameMap.brickGroup, gameMap.ironGroup)
+            #                 allTankGroup.add(each)
+            #         else:
+            #             screen.blit(each.tank_R1, (each.rect.left, each.rect.top))
+            #             if enemyCouldMove:
+            #                 allTankGroup.remove(each)
+            #                 each.move(allTankGroup, gameMap.brickGroup, gameMap.ironGroup)
+            #                 allTankGroup.add(each)                    
+            #     else:
+            #         # 播放5毛钱特效
+            #         if each.times > 0:
+            #             each.times -= 1
+            #             if each.times <= 10:
+            #                 screen.blit(appearance[2], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 20:
+            #                 screen.blit(appearance[1], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 30:
+            #                 screen.blit(appearance[0], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 40:
+            #                 screen.blit(appearance[2], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 50:
+            #                 screen.blit(appearance[1], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 60:
+            #                 screen.blit(appearance[0], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 70:
+            #                 screen.blit(appearance[2], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 80:
+            #                 screen.blit(appearance[1], (3 + each.x * 12 * 24, 3))
+            #             elif each.times <= 90:
+            #                 screen.blit(appearance[0], (3 + each.x * 12 * 24, 3))
+            #         if each.times == 0:
+            #             each.flash = True
         
                     
             # 绘制我方子弹1
-            if myTank_T1.bullet.life:
-                myTank_T1.bullet.move()    
-                screen.blit(myTank_T1.bullet.bullet, myTank_T1.bullet.rect)
-                # 子弹 碰撞 子弹
-                for each in enemyBulletGroup:
-                    if each.life:
-                        if pygame.sprite.collide_rect(myTank_T1.bullet, each):
-                            myTank_T1.bullet.life = False
-                            each.life = False
-                            pygame.sprite.spritecollide(myTank_T1.bullet, enemyBulletGroup, True, None)
-                # 子弹 碰撞 敌方坦克
-                # if pygame.sprite.spritecollide(myTank_T1.bullet, mediumEnemyGroup, True, None):
-                #     # prop.change()
-                #     bang_sound.play()
-                #     existEnemyTanks -= 1
-                #     myTank_T1.bullet.life = False
-                if pygame.sprite.spritecollide(myTank_T1.bullet,mediumEnemyGroup, False, None):
-                    for each in mediumEnemyGroup:
-                        if pygame.sprite.collide_rect(myTank_T1.bullet, each):
-                            if each.life == 1:
-                                pygame.sprite.spritecollide(myTank_T1.bullet,mediumEnemyGroup, True, None)
-                                bang_sound.play()
-                                existEnemyTanks -= 1
-                                totalEnemyTanks -= 1
-                            elif each.life == 2:
-                                each.life -= 1
-                                each.tank = each.enemy_2_1
-                    myTank_T1.bullet.life = False
-                elif pygame.sprite.spritecollide(myTank_T1.bullet,heavyEnemyGroup, False, None):
-                    for each in heavyEnemyGroup:
-                        if pygame.sprite.collide_rect(myTank_T1.bullet, each):
-                            if each.life == 1:
-                                pygame.sprite.spritecollide(myTank_T1.bullet,heavyEnemyGroup, True, None)
-                                bang_sound.play()
-                                existEnemyTanks -= 1
-                                totalEnemyTanks -= 1
-                            elif each.life == 2:
-                                each.life -= 1
-                                each.tank = each.enemy_3_0
-                            elif each.life == 3:
-                                each.life -= 1
-                                each.tank = each.enemy_3_2
-                    myTank_T1.bullet.life = False
-                elif pygame.sprite.spritecollide(myTank_T1.bullet, lightEnemyGroup, True, None):
-                    bang_sound.play()
-                    existEnemyTanks -= 1
-                    totalEnemyTanks -= 1
-                    myTank_T1.bullet.life = False    
-                #if pygame.sprite.spritecollide(myTank_T1.bullet, allEnemyGroup, True, None):
-                #    bang_sound.play()
-                #    existEnemyTanks -= 1
-                #    myTank_T1.bullet.life = False
-                # 子弹 碰撞 brickGroup
-                if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.brickGroup, True, None):
-                    myTank_T1.bullet.life = False
-                    myTank_T1.bullet.rect.left, myTank_T1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
-                # 子弹 碰撞 brickGroup
-                # if myTank_T1.bullet.strong:
-                #     if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.ironGroup, True, None):
-                #         myTank_T1.bullet.life = False
-                #         myTank_T1.bullet.rect.left, myTank_T1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
-                else:    
-                    if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.ironGroup, False, None):
-                        myTank_T1.bullet.life = False
-                        myTank_T1.bullet.rect.left, myTank_T1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+            if myTank1.createBulletImage(screen, enemyBulletGroup, heavyEnemyGroup, mediumEnemyGroup, lightEnemyGroup, gameMap.brickGroup, gameMap.ironGroup, gameMusic) == -1:
+                existEnemyTanks -= 1
+                totalEnemyTanks -= 1
+            
+            # if myTank1.bullet.life:
+            #     myTank1.bullet.move()    
+            #     screen.blit(myTank1.bullet.bullet, myTank1.bullet.rect)
+            #     # 子弹 碰撞 子弹
+            #     for each in enemyBulletGroup:
+            #         if each.life:
+            #             if pygame.sprite.collide_rect(myTank1.bullet, each):
+            #                 myTank1.bullet.life = False
+            #                 each.life = False
+            #                 pygame.sprite.spritecollide(myTank1.bullet, enemyBulletGroup, True, None)
+            #     # 子弹 碰撞 敌方坦克
+            #     # if pygame.sprite.spritecollide(myTank1.bullet, mediumEnemyGroup, True, None):
+            #     #     # prop.change()
+            #     #     bang_sound.play()
+            #     #     existEnemyTanks -= 1
+            #     #     myTank1.bullet.life = False
+            #     if pygame.sprite.spritecollide(myTank1.bullet,mediumEnemyGroup, False, None):
+            #         for each in mediumEnemyGroup:
+            #             if pygame.sprite.collide_rect(myTank1.bullet, each):
+            #                 if each.life == 1:
+            #                     pygame.sprite.spritecollide(myTank1.bullet,mediumEnemyGroup, True, None)
+            #                     gameMusic.boom()
+            #                     existEnemyTanks -= 1
+            #                     totalEnemyTanks -= 1
+            #                 elif each.life == 2:
+            #                     each.life -= 1
+            #                     each.tank = each.enemy_2_1
+            #         myTank1.bullet.life = False
+            #     elif pygame.sprite.spritecollide(myTank1.bullet,heavyEnemyGroup, False, None):
+            #         for each in heavyEnemyGroup:
+            #             if pygame.sprite.collide_rect(myTank1.bullet, each):
+            #                 if each.life == 1:
+            #                     pygame.sprite.spritecollide(myTank1.bullet,heavyEnemyGroup, True, None)
+            #                     gameMusic.boom()
+            #                     existEnemyTanks -= 1
+            #                     totalEnemyTanks -= 1
+            #                 elif each.life == 2:
+            #                     each.life -= 1
+            #                     each.tank = each.enemy_3_0
+            #                 elif each.life == 3:
+            #                     each.life -= 1
+            #                     each.tank = each.enemy_3_2
+            #         myTank1.bullet.life = False
+            #     elif pygame.sprite.spritecollide(myTank1.bullet, lightEnemyGroup, True, None):
+            #         gameMusic.boom()
+            #         existEnemyTanks -= 1
+            #         totalEnemyTanks -= 1
+            #         myTank1.bullet.life = False    
+            #     #if pygame.sprite.spritecollide(myTank1.bullet, allEnemyGroup, True, None):
+            #     #    bang_sound.play()
+            #     #    existEnemyTanks -= 1
+            #     #    myTank1.bullet.life = False
+            #     # 子弹 碰撞 brickGroup
+            #     if pygame.sprite.spritecollide(myTank1.bullet, gameMap.brickGroup, True, None):
+            #         myTank1.bullet.life = False
+            #         myTank1.bullet.rect.left, myTank1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+            #     # 子弹 碰撞 brickGroup
+            #     # if myTank1.bullet.strong:
+            #     #     if pygame.sprite.spritecollide(myTank1.bullet, gameMap.ironGroup, True, None):
+            #     #         myTank1.bullet.life = False
+            #     #         myTank1.bullet.rect.left, myTank1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+            #     else:    
+            #         if pygame.sprite.spritecollide(myTank1.bullet, gameMap.ironGroup, False, None):
+            #             myTank1.bullet.life = False
+            #             myTank1.bullet.rect.left, myTank1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
             
             # 绘制我方子弹2
             if playerNum != 1:
-                if myTank_T2.bullet.life:
-                    myTank_T2.bullet.move()    
-                    screen.blit(myTank_T2.bullet.bullet, myTank_T2.bullet.rect)
-                    # 子弹 碰撞 敌方坦克
-                    if pygame.sprite.spritecollide(myTank_T2.bullet, allEnemyGroup, True, None):
-                        bang_sound.play()
-                        existEnemyTanks -= 1
-                        totalEnemyTanks -= 1
-                        myTank_T2.bullet.life = False
-                    # 子弹 碰撞 brickGroup
-                    if pygame.sprite.spritecollide(myTank_T2.bullet, bgMap.brickGroup, True, None):
-                        myTank_T2.bullet.life = False
-                        myTank_T2.bullet.rect.left, myTank_T2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
-                    # 子弹 碰撞 brickGroup
-                    # if myTank_T2.bullet.strong:
-                    #     if pygame.sprite.spritecollide(myTank_T2.bullet, bgMap.ironGroup, True, None):
-                    #         myTank_T2.bullet.life = False
-                    #         myTank_T2.bullet.rect.left, myTank_T2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
-                    else:    
-                        if pygame.sprite.spritecollide(myTank_T2.bullet, bgMap.ironGroup, False, None):
-                            myTank_T2.bullet.life = False
-                            myTank_T2.bullet.rect.left, myTank_T2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+                if myTank2.createBulletImage(screen, enemyBulletGroup, heavyEnemyGroup, mediumEnemyGroup, lightEnemyGroup, gameMap.brickGroup, gameMap.ironGroup, gameMusic) == -1:
+                    existEnemyTanks -= 1
+                    totalEnemyTanks -= 1
+                # if myTank2.bullet.life:
+                #     myTank2.bullet.move()    
+                #     screen.blit(myTank2.bullet.bullet, myTank2.bullet.rect)
+                #     # 子弹 碰撞 敌方坦克
+                #     if pygame.sprite.spritecollide(myTank2.bullet, allEnemyGroup, True, None):
+                #         gameMusic.boom()
+                #         existEnemyTanks -= 1
+                #         totalEnemyTanks -= 1
+                #         myTank2.bullet.life = False
+                #     # 子弹 碰撞 brickGroup
+                #     if pygame.sprite.spritecollide(myTank2.bullet, gameMap.brickGroup, True, None):
+                #         myTank2.bullet.life = False
+                #         myTank2.bullet.rect.left, myTank2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+                #     # 子弹 碰撞 brickGroup
+                #     # if myTank2.bullet.strong:
+                #     #     if pygame.sprite.spritecollide(myTank2.bullet, gameMap.ironGroup, True, None):
+                #     #         myTank2.bullet.life = False
+                #     #         myTank2.bullet.rect.left, myTank2.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+                #     else:    
+                #         if pygame.sprite.spritecollide(myTank2.bullet, gameMap.ironGroup, False, None):
+                #             myTank2.bullet.life = False
+                #             myTank2.bullet.rect.left, myTank2.bullet.rect.right = 3  + 12 * 24, 3 + 24 * 24
             
 
             # 绘制敌人子弹
-            for each in allEnemyGroup:
-                # 如果子弹没有生命，则赋予子弹生命
-                if not each.bullet.life and each.bulletNotCooling and enemyCouldMove:
-                    enemyBulletGroup.remove(each.bullet)
-                    each.shoot()
-                    enemyBulletGroup.add(each.bullet)
-                    each.bulletNotCooling = False
-                # 如果5毛钱特效播放完毕 并且 子弹存活 则绘制敌方子弹
-                if each.flash:
-                    if each.bullet.life:
-                        # 如果敌人可以移动
-                        if enemyCouldMove:
-                            each.bullet.move()
-                        screen.blit(each.bullet.bullet, each.bullet.rect)
-                        # 子弹 碰撞 我方坦克
-                        if pygame.sprite.collide_rect(each.bullet, myTank_T1):
-                            bang_sound.play()
-                            myTank_T1.rect.left, myTank_T1.rect.top = 3 + 8 * 24, 3 + 24 * 24 
-                            each.bullet.life = False
-                            moving = 0  # 重置移动控制参数
-                            # for i in range(myTank_T1.level+1):
-                            #     myTank_T1.levelDown()
-                            myTank_T1.life -= 1
-                            if myTank_T1.life == 0:
-                                isOver = True
-                        if playerNum != 1:
-                            if pygame.sprite.collide_rect(each.bullet, myTank_T2):
-                                bang_sound.play()
-                                myTank_T2.rect.left, myTank_T2.rect.top = 3 + 16 * 24, 3 + 24 * 24 
-                                each.bullet.life = False
-                                myTank_T2.life -= 1
-                                if myTank_T2.life == 0 and myTank_T1.life == 0:
-                                    isOver = True
-                        # 子弹 碰撞 brickGroup
-                        if pygame.sprite.spritecollide(each.bullet, bgMap.brickGroup, True, None):
-                            each.bullet.life = False
-                        # 子弹 碰撞 ironGroup
-                        # if each.bullet.strong:
-                        #     if pygame.sprite.spritecollide(each.bullet, bgMap.ironGroup, True, None):
-                        #         each.bullet.life = False
-                        else:    
-                            if pygame.sprite.spritecollide(each.bullet, bgMap.ironGroup, False, None):
-                                each.bullet.life = False
+            print(myTank1.life)
+            if playerNum == 1:
+                enemy.createBulletImage(screen, allEnemyGroup, enemyCouldMove, enemyBulletGroup, myTank1, gameMusic, isOver, playerNum, gameMap, myTank2)
+                    # print(myTank1.life)
+                    # myTank1.life -= 1
+                if myTank1.life == 0:
+                    isOver = True
+                
+            if playerNum != 1:
+                enemy.createBulletImage(screen, allEnemyGroup, enemyCouldMove, enemyBulletGroup, myTank1, gameMusic, isOver, playerNum, gameMap, myTank2)
+                if myTank1.life == 0 and myTank2.life == 0:
+                    isover = True
+            # for each in allEnemyGroup:
+            #     # 如果子弹没有生命，则赋予子弹生命
+            #     if not each.bullet.life and each.bulletNotCooling and enemyCouldMove:
+            #         enemyBulletGroup.remove(each.bullet)
+            #         each.shoot()
+            #         enemyBulletGroup.add(each.bullet)
+            #         each.bulletNotCooling = False
+            #     # 如果5毛钱特效播放完毕 并且 子弹存活 则绘制敌方子弹
+            #     if each.flash:
+            #         if each.bullet.life:
+            #             # 如果敌人可以移动
+            #             if enemyCouldMove:
+            #                 each.bullet.move()
+            #             screen.blit(each.bullet.bullet, each.bullet.rect)
+            #             # 子弹 碰撞 我方坦克
+            #             if pygame.sprite.collide_rect(each.bullet, myTank1):
+            #                 gameMusic.boom()
+            #                 myTank1.rect.left, myTank1.rect.top = 3 + 8 * 24, 3 + 24 * 24 
+            #                 each.bullet.life = False
+            #                 myTank1.moving = 0  # 重置移动控制参数
+            #                 # for i in range(myTank1.level+1):
+            #                 #     myTank1.levelDown()
+            #                 myTank1.life -= 1
+            #                 if myTank1.life == 0:
+            #                     isOver = True
+            #             if playerNum != 1:
+            #                 if pygame.sprite.collide_rect(each.bullet, myTank2):
+            #                     gameMusic.boom()
+            #                     myTank2.rect.left, myTank2.rect.top = 3 + 16 * 24, 3 + 24 * 24 
+            #                     each.bullet.life = False
+            #                     myTank2.life -= 1
+            #                     if myTank2.life == 0 and myTank1.life == 0:
+            #                         isOver = True
+            #             # 子弹 碰撞 brickGroup
+            #             if pygame.sprite.spritecollide(each.bullet, gameMap.brickGroup, True, None):
+            #                 each.bullet.life = False
+            #             # 子弹 碰撞 ironGroup
+            #             # if each.bullet.strong:
+            #             #     if pygame.sprite.spritecollide(each.bullet, gameMap.ironGroup, True, None):
+            #             #         each.bullet.life = False
+            #             else:    
+            #                 if pygame.sprite.spritecollide(each.bullet, gameMap.ironGroup, False, None):
+            #                     each.bullet.life = False
                 
             
                         

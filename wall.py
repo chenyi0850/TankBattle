@@ -51,7 +51,7 @@ class River(pygame.sprite.Sprite):
 
         
 class Map():
-    def __init__(self, stage):
+    def __init__(self):
         self.brickGroup = pygame.sprite.Group()
         self.ironGroup  = pygame.sprite.Group()
         self.grassGroup = pygame.sprite.Group()        
@@ -121,7 +121,7 @@ class Map():
         while i < 25:
             j = 2
             while j < 23:
-                flag = random.randint(1, 20)
+                flag = random.randint(1, 30)
                 if flag == 1 or flag == 2:
                     self.brick1 = Brick()
                     self.brick1.rect.left, self.brick1.rect.top = 3 + (i+1) * 24, 3 + j * 24
@@ -140,9 +140,18 @@ class Map():
                     self.iron.rect.left, self.iron.rect.top = 3 + i * 24, 3 + j * 24
                     self.ironGroup.add(self.iron)
                 if flag == 4:
-                    self.grass = Grass()
-                    self.grass.rect.left, self.grass.rect.top = 3 + i * 24, 3 + j * 24
-                    self.grassGroup.add(self.grass)
+                    self.grass1 = Grass()
+                    self.grass1.rect.left, self.grass1.rect.top = 3 + i * 24, 3 + j * 24
+                    self.grassGroup.add(self.grass1)
+                    self.grass2 = Grass()
+                    self.grass2.rect.left, self.grass2.rect.top = 3 + i * 24, 3 + (j+1) * 24
+                    self.grassGroup.add(self.grass2)
+                    self.grass3 = Grass()
+                    self.grass3.rect.left, self.grass3.rect.top = 3 + (i+1) * 24, 3 + j * 24
+                    self.grassGroup.add(self.grass3)
+                    self.grass4 = Grass()
+                    self.grass4.rect.left, self.grass4.rect.top = 3 + (i+1) * 24, 3 + (j+1) * 24
+                    self.grassGroup.add(self.grass4)
                 j += 1
             i += 1
 
