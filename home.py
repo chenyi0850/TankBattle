@@ -7,13 +7,11 @@ import pygame
 class Home(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
-		self.homes = ['image/home1.png', 'image/home.png']
-		self.home = pygame.image.load(self.homes[0])
+		self.home = pygame.image.load('image/home1.png')
 		self.rect = self.home.get_rect()
 		self.rect.left, self.rect.top = (3 + 12 * 24, 3 + 24 * 24)
 		self.alive = True
-		print('home')
-	# 大本营置为摧毁状态
-	def set_dead(self):
-		self.home = pygame.image.load(self.homes[-1])
+	# 大本营被摧毁
+	def setDead(self):
+		self.home = pygame.image.load('image/home.png')
 		self.alive = False
